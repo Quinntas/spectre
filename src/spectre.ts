@@ -1,6 +1,7 @@
 import {ISpectre} from "./iSpectre";
 import {MySQL} from "./mysql/mysql";
 import {Strategy} from "./core/strategy";
+import {PostgreSQL} from "./mysql/postgresql";
 
 
 export class Spectre implements ISpectre {
@@ -16,6 +17,9 @@ export class Spectre implements ISpectre {
         switch (databaseType) {
             case "mysql":
                 return new MySQL(databaseConnectionUrl)
+            case "postgresql":
+            case "postgres":
+                return new PostgreSQL(databaseConnectionUrl)
             default:
                 throw new Error(`Database not supported: ${databaseType}`)
         }

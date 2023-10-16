@@ -21,6 +21,6 @@ export class Result<ReturnValueType> {
     }
 }
 
-export const result = <ReturnValueType>(isSuccessful: boolean, returnValue: ReturnValueType, isError: boolean, errorType?: SpectreError): Result<ReturnValueType> => {
+export const result = <ReturnValueType>(isSuccessful: boolean, returnValue: ReturnValueType, isError: boolean = false, errorType?: SpectreError): Result<ReturnValueType> => {
     return new Result<ReturnValueType>(isSuccessful, returnValue, isError, errorType);
 }
