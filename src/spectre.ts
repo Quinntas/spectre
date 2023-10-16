@@ -1,7 +1,7 @@
 import {ISpectre} from "./iSpectre";
 import {MySQL} from "./mysql/mysql";
 import {Strategy} from "./core/strategy";
-import {PostgreSQL} from "./mysql/postgresql";
+import {PostgreSQL} from "./postgresql/postgresql";
 
 
 export class Spectre implements ISpectre {
