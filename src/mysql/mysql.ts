@@ -1,33 +1,25 @@
-import mysql from 'mysql'
+import mysql from 'mysql';
 import {Strategy} from "../core/strategy";
 import {Result, result, SpectreError} from "../core/result";
 import {ConnectionStringParser, IConnectionStringParameters} from "../core/parsers/connectionStringParser";
 
 export class MySQL implements Strategy {
     private readonly dateBaseUrl: string;
+    private connectionObject: IConnectionStringParameters;
+    private readonly connectionPool: mysql.Pool;
 
-    private connectionObject: IConnectionStringParameters
-
-    private readonly connection: mysql.Connection
-
-    public constructor(dateBaseUrl: string, autoConnect: boolean = true) {
+    constructor(dateBaseUrl: string) {
         this.dateBaseUrl = dateBaseUrl;
-
         const connectionStringParser = new ConnectionStringParser({
             scheme: "mysql",
             hosts: []
-        })
-
-        this.connectionObject = connectionStringParser.parse(this.dateBaseUrl)
-
-        this.connection = this.setConnection()
-
-        if (autoConnect)
-            this.connect()
+        });
+        this.connectionObject = connectionStringParser.parse(this.dateBaseUrl);
+        this.connectionPool = this.setConnection();
     }
 
-    private setConnection() {
-        return mysql.createConnection({
+    private setConnection(): mysql.Pool {
+        return mysql.createPool({
             host: this.connectionObject.hosts[0].host,
             port: this.connectionObject.hosts[0].port,
             user: this.connectionObject.username,
@@ -36,38 +28,71 @@ export class MySQL implements Strategy {
             ssl: {
                 rejectUnauthorized: false
             }
-        })
+        });
     }
 
     private errorHandler(err: mysql.MysqlError): Result<any> {
-        console.log(err)
+        console.log(err);
         switch (err.code) {
+            case "ER_NO_SUCH_TABLE":
+                return result(false, err.sqlMessage, true, SpectreError.DATABASE_BAD_REQUEST);
             case "ER_DUP_ENTRY":
-                return result(false, err.sqlMessage, true, SpectreError.DATABASE_DUPLICATE_ENTRY)
+                return result(false, err.sqlMessage, true, SpectreError.DATABASE_DUPLICATE_ENTRY);
             case "ER_WRONG_VALUE":
-                return result(false, err.sqlMessage, true, SpectreError.DATABASE_WRONG_VALUE)
+                return result(false, err.sqlMessage, true, SpectreError.DATABASE_WRONG_VALUE);
             default:
-                return result(false, err, true)
+                return result(false, err, true);
         }
     }
 
     public async rawQuery<ReturnValueType = any>(query: string): Promise<Result<ReturnValueType>> {
-        const connection = this.connection
-        const errorHandler = this.errorHandler
-        return new Promise(function (resolve, reject) {
+        let connection: mysql.PoolConnection | null = null;
+        try {
+            connection = await this.getConnection();
+            const values = await this.executeQuery(connection, query);
+            return result<ReturnValueType>(true, values, false);
+        } catch (err) {
+            return result(false, err, true);
+        } finally {
+            if (connection) {
+                connection.release();
+            }
+        }
+    }
+
+    private getConnection(): Promise<mysql.PoolConnection> {
+        return new Promise((resolve, reject) => {
+            this.connectionPool.getConnection((err, connection) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(connection);
+                }
+            });
+        });
+    }
+
+    private executeQuery(connection: mysql.PoolConnection, query: string): Promise<any> {
+        return new Promise((resolve, reject) => {
             connection.query(query, (err: mysql.MysqlError, values) => {
-                if (err)
-                    reject(errorHandler(err))
-                resolve(result<ReturnValueType>(true, values, false))
-            })
-        })
+                if (err) {
+                    reject(this.errorHandler(err));
+                } else {
+                    resolve(values);
+                }
+            });
+        });
     }
 
-    private connect() {
-        this.connection.connect()
-    }
-
-    private endConnection() {
-        this.connection.end()
+    public endConnectionPool(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.connectionPool.end((err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 }
