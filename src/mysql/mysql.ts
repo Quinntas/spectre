@@ -39,6 +39,7 @@ export class MySQL implements Strategy {
 			case "ER_DUP_ENTRY":
 				return result(false, err.sqlMessage, true, SpectreError.DATABASE_DUPLICATE_ENTRY);
 			case "ER_WRONG_VALUE":
+			case "ER_TRUNCATED_WRONG_VALUE":
 				return result(false, err.sqlMessage, true, SpectreError.DATABASE_WRONG_VALUE);
 			default:
 				return result(false, err, true);
