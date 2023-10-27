@@ -25,6 +25,9 @@ export class MySQL implements Strategy {
 			user: this.connectionObject.username,
 			password: this.connectionObject.password,
 			database: this.connectionObject.endpoint,
+			waitForConnections: true,
+			connectionLimit: 10,
+			queueLimit: 0,
 			ssl: {
 				rejectUnauthorized: true
 			}
