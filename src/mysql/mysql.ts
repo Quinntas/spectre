@@ -50,6 +50,9 @@ export class MySQL implements Strategy {
 		let connection: mysql.PoolConnection = await this.getConnection();
 		try {
 			const values = await this.executeQuery(connection, query);
+			const isSelect = query.toLowerCase().includes("select") 
+			if (isSelect && values.length === 0)
+				return result<ReturnValueType>(false, values, false);
 			return result<ReturnValueType>(true, values, false);
 		} catch (err) {
 			throw err;
