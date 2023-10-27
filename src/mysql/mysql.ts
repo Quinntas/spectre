@@ -26,7 +26,7 @@ export class MySQL implements Strategy {
 			password: this.connectionObject.password,
 			database: this.connectionObject.endpoint,
 			ssl: {
-				rejectUnauthorized: false
+				rejectUnauthorized: true
 			}
 		});
 	}
