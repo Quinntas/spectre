@@ -45,6 +45,7 @@ export class MySQL implements Strategy {
     private errorHandler(err: mysql.MysqlError): Result<any> {
         console.log(err);
         switch (err.code) {
+            case "ER_PARSE_ERROR":
             case "ER_BAD_FIELD_ERROR:":
             case "ER_NO_SUCH_TABLE":
                 return result(false, err.sqlMessage, true, SpectreError.DATABASE_BAD_REQUEST);
