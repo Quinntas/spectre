@@ -6,17 +6,15 @@ import {Primitive} from "../core/utils/types/primitive";
 import {sql} from "../core/utils/templateStrings/sql";
 
 export class MySQL implements Strategy {
-    private readonly dateBaseUrl: string;
     private connectionObject: IConnectionStringParameters;
     private readonly connectionPool: mysql.Pool;
 
     constructor(dateBaseUrl: string) {
-        this.dateBaseUrl = dateBaseUrl;
         const connectionStringParser = new ConnectionStringParser({
             scheme: "mysql",
             hosts: []
         });
-        this.connectionObject = connectionStringParser.parse(this.dateBaseUrl);
+        this.connectionObject = connectionStringParser.parse(dateBaseUrl);
         this.connectionPool = this.setConnection();
         this.applyQueryFormatToPoolConnections()
     }
