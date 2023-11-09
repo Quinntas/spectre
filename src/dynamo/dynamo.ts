@@ -1,7 +1,7 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {Strategy} from "../core/strategy";
 import {Primitive} from "../core/utils/types/primitive";
-import {Result} from "../core/result";
+import {result, Result, SpectreError} from "../core/result";
 import {DynamoDBDocumentClient, ExecuteStatementCommand,} from "@aws-sdk/lib-dynamodb";
 
 interface AWSConfig {
@@ -38,22 +38,27 @@ export class Dynamo implements Strategy {
 
     }
 
-    public async rawQuery<ReturnValueType = any>(query: string, values: Primitive[]): Promise<Result<ReturnValueType>> {
+    private errorHandler(err: Error): Result<any> {
+        switch (err.name) {
+            case "ResourceNotFoundException":
+                return result(false, err.message, true, SpectreError.DATABASE_BAD_REQUEST);
+            default:
+                return result(false, err.message, true, SpectreError.DATABASE_INTERNAL_ERROR);
+        }
+    }
+
+    public async rawQuery<ReturnValueType = any | any[]>(query: string, values: Primitive[]): Promise<Result<ReturnValueType>> {
         const command = new ExecuteStatementCommand({
             Statement: query,
             Parameters: values,
             ConsistentRead: true,
         });
 
-        const result = await this.docClient.send(command)
-
-        console.log(result)
-
-        return {
-            isSuccessful: true,
-            returnValue: null,
-            errorType: null,
-            isError: false,
-        };
+        try {
+            const resultValues = await this.docClient.send(command)
+            return result<ReturnValueType>(resultValues.Items.length > 0, resultValues as ReturnValueType, false);
+        } catch (e) {
+            return this.errorHandler(e)
+        }
     }
 }
