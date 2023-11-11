@@ -1,6 +1,6 @@
 {
   "name": "spectre-orm",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "",
   "main": "./dist",
   "scripts": {
@@ -8,6 +8,11 @@
     "prepublish": "pnpm run build",
     "build": "rimraf ./dist && tsc"
   },
+  "files": [
+    "build/",
+    "License",
+    "README.md"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
