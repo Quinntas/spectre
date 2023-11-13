@@ -43,7 +43,7 @@ export class Sqlite implements Strategy {
             const returnValues = await this.connection.all(query, values)
             return result(returnValues.length > 0, returnValues as ReturnValueType, false)
         } catch (e) {
-            return this.errorHandler(e)
+            throw this.errorHandler(e)
         }
     }
 

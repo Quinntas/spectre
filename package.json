@@ -1,6 +1,6 @@
 {
   "name": "spectre-orm",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "main": "./build/spectre.js",
   "types": "./build/spectre.d.ts",
   "description": "",

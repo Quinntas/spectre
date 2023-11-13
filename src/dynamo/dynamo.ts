@@ -58,7 +58,7 @@ export class Dynamo implements Strategy {
             const resultValues = await this.docClient.send(command)
             return result<ReturnValueType>(resultValues.Items.length > 0, resultValues as ReturnValueType, false);
         } catch (e) {
-            return this.errorHandler(e)
+            throw this.errorHandler(e)
         }
     }
 }

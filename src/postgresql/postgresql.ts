@@ -53,7 +53,7 @@ export class Postgresql implements Strategy {
             const resultValues = await client.query<ReturnValueType>(queryConfig)
             return result<ReturnValueType>(resultValues.rowCount > 0, resultValues.rows as ReturnValueType, false);
         } catch (e) {
-            return this.errorHandler(e)
+            throw this.errorHandler(e)
         } finally {
             client.release()
         }
