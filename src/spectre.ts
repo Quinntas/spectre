@@ -3,9 +3,11 @@ import {MySQL} from "./mysql/mysql";
 import {Strategy} from "./core/strategy";
 import {Dynamo} from "./dynamo/dynamo";
 import {Postgresql} from "./postgresql/postgresql";
+import {Sqlite} from "./sqlite/sqlite";
 
 export enum SpectreDatabases {
     mysql,
+    sqlite,
     dynamodb,
     postgresql
 }
@@ -23,6 +25,8 @@ export class Spectre implements ISpectre {
                 return new MySQL(args[0])
             case SpectreDatabases.postgresql:
                 return new Postgresql(args[0])
+            case SpectreDatabases.sqlite:
+                return new Sqlite(args[0])
             case SpectreDatabases.dynamodb:
                 return new Dynamo(args[0], args[1], args[2])
             default:
@@ -30,4 +34,3 @@ export class Spectre implements ISpectre {
         }
     }
 }
-

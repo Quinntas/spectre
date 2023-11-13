@@ -1,6 +1,6 @@
 {
   "name": "spectre-orm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "./build/spectre.js",
   "types": "./build/spectre.d.ts",
   "description": "",
@@ -21,7 +21,9 @@
     "@aws-sdk/lib-dynamodb": "^3.445.0",
     "mysql": "^2.18.1",
     "pg": "^8.11.3",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",
