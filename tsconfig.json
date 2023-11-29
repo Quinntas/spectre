@@ -19,7 +19,7 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "src/**/*"
+    "src/spectre.ts"
   ],
   "exclude": [
     "node_modules"
