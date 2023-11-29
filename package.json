@@ -21,9 +21,7 @@
     "@aws-sdk/lib-dynamodb": "^3.445.0",
     "mysql": "^2.18.1",
     "pg": "^8.11.3",
-    "rimraf": "^5.0.5",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.6"
+    "rimraf": "^5.0.5"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",
