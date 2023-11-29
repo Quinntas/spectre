@@ -1,25 +1,12 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Default",
   "compilerOptions": {
-    "composite": false,
     "declaration": true,
     "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "moduleResolution": "node",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "baseUrl": ".",
-    "outFile": "index.js",
-    "allowSyntheticDefaultImports": true
+    "emitDeclarationOnly": true,
+    "outFile": "index.d.ts"
   },
   "include": [
-    "src/spectre.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
