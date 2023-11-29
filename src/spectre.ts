@@ -4,6 +4,11 @@ import {Strategy} from "./core/strategy";
 import {Dynamo} from "./dynamo/dynamo";
 import {Postgresql} from "./postgresql/postgresql";
 
+export {SpectreError, Result} from "./core/result";
+export {partiql} from "./core/utils/templateStrings/partiql"
+export {sql} from "./core/utils/templateStrings/sql"
+export {Primitive} from "./core/utils/types/primitive"
+
 export enum SpectreDatabases {
     mysql,
     dynamodb,
@@ -30,3 +35,5 @@ export class Spectre implements ISpectre {
         }
     }
 }
+
+
