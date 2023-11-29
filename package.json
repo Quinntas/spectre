@@ -1,18 +1,17 @@
 {
   "name": "spectre-orm",
-  "version": "1.0.8",
-  "main": "./build/spectre.js",
+  "version": "1.0.9",
+  "main": "index.js",
   "types": "index.d.ts",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "pnpm run build",
-    "build": "rimraf ./dist && tsc --module amd "
+    "build": "tsc --module amd "
   },
   "files": [
-    "build/index.d.ts",
-    "build/index.js",
-    "build/index.d.ts.map",
+    "index.d.ts",
+    "index.js",
     "License",
     "README.md",
     "index.d.ts"
@@ -23,8 +22,7 @@
     "@aws-sdk/client-dynamodb": "^3.445.0",
     "@aws-sdk/lib-dynamodb": "^3.445.0",
     "mysql": "^2.18.1",
-    "pg": "^8.11.3",
-    "rimraf": "^5.0.5"
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21",

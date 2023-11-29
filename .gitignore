@@ -56,6 +56,10 @@ web_modules/
 # Optional npm cache directory
 .npm
 
+index.d.ts
+index.d.ts.map
+index.js
+
 # Optional eslint cache
 .eslintcache
 

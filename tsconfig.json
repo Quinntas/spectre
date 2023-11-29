@@ -15,7 +15,7 @@
     "skipLibCheck": true,
     "strict": false,
     "baseUrl": ".",
-    "outFile": "./build/index.js",
+    "outFile": "index.js",
     "allowSyntheticDefaultImports": true
   },
   "include": [
