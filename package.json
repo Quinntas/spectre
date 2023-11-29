@@ -1,16 +1,18 @@
 {
   "name": "spectre-orm",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "./build/spectre.js",
   "types": "index.d.ts",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "pnpm run build",
-    "build": "rimraf ./dist && tsc && move .\\build\\index.d.ts ."
+    "build": "rimraf ./dist && tsc --module amd "
   },
   "files": [
-    "build/",
+    "build/index.d.ts",
+    "build/index.js",
+    "build/index.d.ts.map",
     "License",
     "README.md",
     "index.d.ts"

@@ -8,7 +8,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
-    "isolatedModules": true,
     "moduleResolution": "node",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -16,7 +15,7 @@
     "skipLibCheck": true,
     "strict": false,
     "baseUrl": ".",
-    "outDir": "./build",
+    "outFile": "./build/index.js",
     "allowSyntheticDefaultImports": true
   },
   "include": [
