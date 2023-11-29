@@ -5,7 +5,7 @@ esbuild.build({
     entryPoints: ['./src/spectre.ts'],
     bundle: true,
     platform: 'node',
-    outfile: './index.cjs',
+    outdir: './dist',
     format: 'cjs',
     sourcemap: true,
     target: 'node16',

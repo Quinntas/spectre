@@ -3,7 +3,12 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
-    "outFile": "index.d.ts"
+    "outDir": "./dist/types",
+    "target": "es6",
+    "lib": [
+      "es6"
+    ],
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/**/*.ts"

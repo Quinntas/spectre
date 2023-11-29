@@ -1,20 +1,19 @@
 {
   "name": "spectre-orm",
-  "version": "1.0.12",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "version": "1.0.13",
+  "main": "dist/spectre.js",
+  "module": "dist/spectre.js",
+  "types": "dist/spectre.d.ts",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "pnpm run build",
-    "build": "node esbuild.config.js "
+    "build": "rimraf ./dist && node esbuild.config.js"
   },
   "files": [
-    "index.d.ts",
-    "index.js",
+    "dist",
     "License",
-    "README.md",
-    "index.d.ts"
+    "README.md"
   ],
   "author": "",
   "license": "ISC",
