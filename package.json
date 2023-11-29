@@ -1,6 +1,6 @@
 {
   "name": "spectre-orm",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "./build/spectre.js",
   "types": "index.d.ts",
   "description": "",
@@ -12,7 +12,8 @@
   "files": [
     "build/",
     "License",
-    "README.md"
+    "README.md",
+    "index.d.ts"
   ],
   "author": "",
   "license": "ISC",
