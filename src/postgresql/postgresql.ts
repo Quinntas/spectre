@@ -1,5 +1,4 @@
-import {Strategy} from "../core/strategy";
-import {Primitive} from "../core/utils/types/primitive";
+import {QueryDTO, Strategy} from "../core/strategy";
 import {result, Result} from "../core/result";
 import {ConnectionStringParser, IConnectionStringParameters} from "../core/parsers/connectionStringParser";
 import {Pool} from "pg";
@@ -33,7 +32,7 @@ export class Postgresql implements Strategy {
 
     async ping() {
         const [query, values] = sql`/* ping */ SELECT 1`
-        await this.rawQuery(query, values)
+        await this.rawQuery({query, values})
     }
 
     private errorHandler(err: Error): Result<any> {
@@ -43,12 +42,14 @@ export class Postgresql implements Strategy {
         }
     }
 
-    async rawQuery<ReturnValueType = any>(query: string, values: Primitive[]): Promise<Result<ReturnValueType>> {
+    async rawQuery<ReturnValueType = any>(queryDTO: QueryDTO): Promise<Result<ReturnValueType>> {
+        if (Array.isArray(queryDTO))
+            throw result(false, "Mysql does not support multiple queries at once", true);
         const client = await this.connectionPool.connect()
         try {
             const queryConfig = {
-                text: query,
-                values,
+                text: queryDTO.query,
+                values: queryDTO.values,
             }
             const resultValues = await client.query<ReturnValueType>(queryConfig)
             return result<ReturnValueType>(resultValues.rowCount > 0, resultValues.rows as ReturnValueType, false);

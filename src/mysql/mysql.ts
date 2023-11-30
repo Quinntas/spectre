@@ -1,5 +1,5 @@
 import mysql from 'mysql';
-import {Strategy} from "../core/strategy";
+import {QueryDTO, Strategy} from "../core/strategy";
 import {Result, result, SpectreError} from "../core/result";
 import {ConnectionStringParser, IConnectionStringParameters} from "../core/parsers/connectionStringParser";
 import {Primitive} from "../core/utils/types/primitive";
@@ -21,7 +21,7 @@ export class MySQL implements Strategy {
 
     public async ping() {
         const [query, values] = sql`/* ping */ SELECT ${1}`
-        await this.rawQuery(query, values)
+        await this.rawQuery({query, values})
     }
 
     private setConnection(): mysql.Pool {
@@ -81,10 +81,12 @@ export class MySQL implements Strategy {
         });
     }
 
-    public async rawQuery<ReturnValueType = any>(query: string, values: Primitive[]): Promise<Result<ReturnValueType>> {
+    public async rawQuery<ReturnValueType = any>(queryDTO: QueryDTO): Promise<Result<ReturnValueType>> {
+        if (Array.isArray(queryDTO))
+            throw result(false, "Mysql does not support multiple queries at once", true);
         let connection: mysql.PoolConnection = await this.getConnection();
         try {
-            const resultValues = await this.executeQuery(connection, query, values);
+            const resultValues = await this.executeQuery(connection, queryDTO.query, queryDTO.values);
             return result<ReturnValueType>(resultValues.length > 0, resultValues, false);
         } catch (err) {
             throw err;
