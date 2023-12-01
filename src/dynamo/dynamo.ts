@@ -2,6 +2,7 @@ import {DynamoDBClient, ExecuteTransactionCommand} from "@aws-sdk/client-dynamod
 import {QueryDTO, Strategy} from "../core/strategy";
 import {result, Result, SpectreError} from "../core/result";
 import {DynamoDBDocumentClient, ExecuteStatementCommand,} from "@aws-sdk/lib-dynamodb";
+import {Primitive} from "../core/utils/types/primitive";
 
 interface AWSConfig {
     region: string
@@ -49,12 +50,14 @@ export class Dynamo implements Strategy {
     public async rawQuery<ReturnValueType = any | any[]>(queryDTO: QueryDTO): Promise<Result<ReturnValueType>> {
         let command: ExecuteStatementCommand;
 
-        if (Array.isArray(queryDTO))
-            command = new ExecuteTransactionCommand(queryDTO.map(query => ({
+        if (Array.isArray(queryDTO)) {
+            const dto: { Statement: string, Parameters: Primitive[] }[] = queryDTO.map(query => ({
                 Statement: query.query,
                 Parameters: query.values,
-            })));
-        else
+            }))
+
+            command = new ExecuteTransactionCommand(dto);
+        } else
             command = new ExecuteStatementCommand({
                 Statement: queryDTO.query,
                 Parameters: queryDTO.values,
