@@ -1,4 +1,4 @@
-import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
+import {DynamoDBClient, ExecuteTransactionCommand} from "@aws-sdk/client-dynamodb";
 import {QueryDTO, Strategy} from "../core/strategy";
 import {result, Result, SpectreError} from "../core/result";
 import {DynamoDBDocumentClient, ExecuteStatementCommand,} from "@aws-sdk/lib-dynamodb";
@@ -50,10 +50,9 @@ export class Dynamo implements Strategy {
         let command: ExecuteStatementCommand;
 
         if (Array.isArray(queryDTO))
-            command = new ExecuteStatementCommand(queryDTO.map(query => ({
+            command = new ExecuteTransactionCommand(queryDTO.map(query => ({
                 Statement: query.query,
                 Parameters: query.values,
-                ConsistentRead: true,
             })));
         else
             command = new ExecuteStatementCommand({
