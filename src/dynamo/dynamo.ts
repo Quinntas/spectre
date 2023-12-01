@@ -47,7 +47,21 @@ export class Dynamo implements Strategy {
     }
 
     public async rawQuery<ReturnValueType = any | any[]>(queryDTO: QueryDTO): Promise<Result<ReturnValueType>> {
-        const command = new ExecuteStatementCommand(queryDTO);
+        let command: ExecuteStatementCommand;
+
+        if (Array.isArray(queryDTO))
+            command = new ExecuteStatementCommand(queryDTO.map(query => ({
+                Statement: query.query,
+                Parameters: query.values,
+                ConsistentRead: true,
+            })));
+        else
+            command = new ExecuteStatementCommand({
+                Statement: queryDTO.query,
+                Parameters: queryDTO.values,
+                ConsistentRead: true,
+            });
+
         try {
             const resultValues = await this.docClient.send(command)
             return result<ReturnValueType>(resultValues.Items.length > 0, resultValues as ReturnValueType, false);
