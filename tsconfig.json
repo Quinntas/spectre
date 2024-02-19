@@ -4,6 +4,7 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist/types",
+    "moduleResolution": "node",
     "target": "es6",
     "lib": [
       "es6"

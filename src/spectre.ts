@@ -35,5 +35,3 @@ export class Spectre implements ISpectre {
         }
     }
 }
-
-
