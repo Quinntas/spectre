@@ -3,6 +3,7 @@ import {MySQL} from "./mysql/mysql";
 import {Strategy} from "./core/strategy";
 import {Dynamo} from "./dynamo/dynamo";
 import {Postgresql} from "./postgresql/postgresql";
+import {sql} from "./core/utils/templateStrings/sql";
 
 export {SpectreError, Result} from "./core/result";
 export {partiql} from "./core/utils/templateStrings/partiql"

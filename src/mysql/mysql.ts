@@ -68,6 +68,7 @@ export class MySQL implements Strategy {
                         case 'boolean':
                             return values[index] ? 'TRUE' : 'FALSE';
                         case 'string':
+                            return this.escape(values[index]);
                         case 'number':
                             return values[index];
                         case 'object':
@@ -87,7 +88,8 @@ export class MySQL implements Strategy {
         let connection: mysql.PoolConnection = await this.getConnection();
         try {
             const resultValues = await this.executeQuery(connection, queryDTO.query, queryDTO.values);
-            return result<ReturnValueType>(true, resultValues, false);
+            const isSuccessful = Array.isArray(resultValues) ? resultValues.length > 0 : true;
+            return result<ReturnValueType>(isSuccessful, resultValues, false);
         } catch (err) {
             throw err;
         } finally {
