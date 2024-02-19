@@ -68,7 +68,6 @@ export class MySQL implements Strategy {
                         case 'boolean':
                             return values[index] ? 'TRUE' : 'FALSE';
                         case 'string':
-                            return this.escape(values[index]);
                         case 'number':
                             return values[index];
                         case 'object':

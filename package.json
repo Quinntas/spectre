@@ -1,6 +1,6 @@
 {
   "name": "spectre-orm",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "main": "dist/spectre.js",
   "module": "dist/spectre.js",
   "types": "dist/spectre.d.ts",
