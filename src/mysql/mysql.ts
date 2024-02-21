@@ -41,7 +41,6 @@ export class MySQL implements Strategy {
     }
 
     private errorHandler(err: mysql.MysqlError): Result<any> {
-        console.log(err);
         switch (err.code) {
             case "ER_EMPTY_QUERY":
             case "ER_PARSE_ERROR":
