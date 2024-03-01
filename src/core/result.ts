@@ -16,7 +16,7 @@ export class SpectreResult<ReturnValueType> {
 
     constructor(isSuccessful: boolean, returnValue: ReturnValueType, isError: boolean = false, errorType?: SpectreError) {
         this.isSuccessful = isSuccessful;
-        this.returnValue = returnValue;
+        this.returnValue = returnValue as ReturnValueType;
         this.isError = isError;
         this.errorType = errorType;
     }
@@ -38,5 +38,5 @@ export const resultError = (message: string, error: SpectreError): SpectreResult
 }
 
 export const result = <ReturnValueType>(isSuccessful: boolean, returnValue: ReturnValueType, isError: boolean = false, errorType?: SpectreError): SpectreResult<ReturnValueType> => {
-    return new SpectreResult<ReturnValueType>(isSuccessful, returnValue, isError, errorType);
+    return new SpectreResult<ReturnValueType>(isSuccessful, returnValue as ReturnValueType, isError, errorType);
 }

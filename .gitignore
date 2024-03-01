@@ -60,6 +60,8 @@ web_modules/
 # Optional npm cache directory
 .npm
 
+uncommit-test.ts
+
 index.d.ts
 index.d.ts.map
 index.js

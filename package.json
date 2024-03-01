@@ -18,15 +18,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.445.0",
-    "@aws-sdk/lib-dynamodb": "^3.445.0",
-    "mysql": "^2.18.1",
-    "pg": "^8.11.3"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
-    "@types/mysql": "^2.15.21",
+    "@types/mysql": "^2.15.22",
     "@types/node": "^20.3.1",
-    "@types/pg": "^8.10.2",
     "esbuild": "^0.19.8",
     "esbuild-plugin-d.ts": "^1.1.0",
     "rimraf": "^5.0.5",

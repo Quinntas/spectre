@@ -1,9 +1,9 @@
-import mysql from 'mysql';
 import {QueryDTO, Strategy} from "../core/strategy";
 import {result, resultError, SpectreError, SpectreResult} from "../core/result";
 import {ConnectionStringParser, IConnectionStringParameters} from "../core/parsers/connectionStringParser";
 import {sql} from "../core/utils/templateStrings/sql";
 import {MySQLConfig} from "./mysql.config";
+import * as mysql from "mysql";
 
 export class MySQL implements Strategy {
     private connectionObject: IConnectionStringParameters;
@@ -17,7 +17,6 @@ export class MySQL implements Strategy {
         this.connectionObject = connectionStringParser.parse(mysqlConfig.uri);
         try {
             this.connectionPool = this.setConnection();
-            this.applyQueryFormatToPoolConnections()
         } catch (err) {
             console.error(err);
             throw resultError("Could not connect to the database", SpectreError.DATABASE_CONNECTION_ERROR)
@@ -26,7 +25,7 @@ export class MySQL implements Strategy {
 
     public async ping() {
         const q = sql`/* ping */ SELECT ${1}`
-        await this.rawQuery(q)
+        await this.raw(q)
     }
 
     private setConnection(): mysql.Pool {
@@ -45,40 +44,34 @@ export class MySQL implements Strategy {
         });
     }
 
-    private errorHandler(err: mysql.MysqlError): SpectreResult<any> {
+    private errorHandler(err: mysql.MysqlError) {
         switch (err.code) {
             case "ER_EMPTY_QUERY":
             case "ER_PARSE_ERROR":
             case "ER_BAD_FIELD_ERROR:":
             case "ER_NO_SUCH_TABLE":
-                return result(false, {message: err.sqlMessage}, true, SpectreError.DATABASE_BAD_REQUEST);
+                return resultError(err.sqlMessage, SpectreError.DATABASE_NOT_FOUND);
             case "ER_DUP_ENTRY":
-                return result(false, {message: err.sqlMessage}, true, SpectreError.DATABASE_DUPLICATE_ENTRY);
+                return resultError(err.sqlMessage, SpectreError.DATABASE_DUPLICATE_ENTRY);
             case "ER_WRONG_VALUE":
             case "ER_TRUNCATED_WRONG_VALUE":
-                return result(false, {message: err.sqlMessage}, true, SpectreError.DATABASE_WRONG_VALUE);
+            case "ER_NO_TABLES_USED":
+                return resultError(err.sqlMessage, SpectreError.DATABASE_WRONG_VALUE);
             default:
-                return result(false, err, true);
+                return resultError(err.message, SpectreError.DATABASE_INTERNAL_ERROR);
         }
     }
 
-    private applyQueryFormatToPoolConnections() {
-        this.connectionPool.on('connection', (connection) => {
-            connection.config.queryFormat = function (query, values) {
-                if (!values) return query;
-                return query.replace(/\$1/g, '?');
-            }
-        });
-    }
-
-    public async rawQuery<ReturnValueType extends object = any>(queryDTO: QueryDTO): Promise<SpectreResult<ReturnValueType>> {
+    public async raw<ReturnValueType extends object = any>(queryDTO: QueryDTO): Promise<SpectreResult<ReturnValueType>> {
         let connection: mysql.PoolConnection = await this.getConnection();
         try {
             const resultValues = await this.executeQuery(connection, queryDTO);
-            const isSuccessful = Array.isArray(resultValues) ? resultValues.length > 0 : true;
-            return result<ReturnValueType>(isSuccessful, resultValues, false);
+            const isArrayAndHasItems = Array.isArray(resultValues) && resultValues.length > 0;
+            const isSuccessful = isArrayAndHasItems || resultValues.affectedRows > 0;
+            const isArrayAndHasOneItem = isArrayAndHasItems && resultValues.length === 1;
+            return result<ReturnValueType>(isSuccessful, isArrayAndHasOneItem ? resultValues[0] : resultValues, false);
         } catch (err) {
-            throw err;
+            throw err
         } finally {
             connection.release();
         }
