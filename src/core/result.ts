@@ -7,7 +7,8 @@ export enum SpectreError {
     DATABASE_NOT_FOUND = "DATABASE_NOT_FOUND",
 }
 
-export class Result<ReturnValueType> {
+
+export class SpectreResult<ReturnValueType> {
     public isSuccessful: boolean;
     public returnValue: ReturnValueType;
     public isError: boolean;
@@ -21,6 +22,21 @@ export class Result<ReturnValueType> {
     }
 }
 
-export const result = <ReturnValueType>(isSuccessful: boolean, returnValue: ReturnValueType, isError: boolean = false, errorType?: SpectreError): Result<ReturnValueType> => {
-    return new Result<ReturnValueType>(isSuccessful, returnValue, isError, errorType);
+export class SpectreResultError extends Error {
+    private errorType: SpectreError;
+
+    constructor(result: SpectreResult<{ message: string }>) {
+        super(result.returnValue.message);
+        this.errorType = result.errorType;
+        this.name = "ResultError";
+        this.message = result.returnValue.message;
+    }
+}
+
+export const resultError = (message: string, error: SpectreError): SpectreResultError => {
+    return new SpectreResultError(result(false, {message}, true, error));
+}
+
+export const result = <ReturnValueType>(isSuccessful: boolean, returnValue: ReturnValueType, isError: boolean = false, errorType?: SpectreError): SpectreResult<ReturnValueType> => {
+    return new SpectreResult<ReturnValueType>(isSuccessful, returnValue, isError, errorType);
 }

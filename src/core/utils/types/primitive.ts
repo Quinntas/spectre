@@ -1,1 +1,1 @@
-export type Primitive = string | number | boolean | undefined | null | object
+export type Primitive<T extends object = object> = string | number | boolean | undefined | null | T

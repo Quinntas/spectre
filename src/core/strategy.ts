@@ -1,12 +1,10 @@
-import {Result} from "./result";
+import {SpectreResult} from "./result";
 import {Primitive} from "./utils/types/primitive";
 
-type QueryValue = { query: string, values: Primitive[] }
-
-export type QueryDTO = QueryValue | QueryValue[]
+export type QueryDTO = [query: string, values: Primitive[]]
 
 export interface Strategy {
-    rawQuery<ReturnValueType = any>(queryDTO: QueryDTO): Promise<Result<ReturnValueType>>
+    rawQuery<ReturnValueType extends object = any>(queryDTO: QueryDTO): Promise<SpectreResult<ReturnValueType>>
 
     ping()
 }

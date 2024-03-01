@@ -1,39 +1,30 @@
-import {ISpectre} from "./iSpectre";
 import {MySQL} from "./mysql/mysql";
 import {Strategy} from "./core/strategy";
-import {Dynamo} from "./dynamo/dynamo";
-import {Postgresql} from "./postgresql/postgresql";
+import {BaseConfig} from "./core/utils/types/baseConfig";
 
-export {SpectreError, Result} from "./core/result";
-export {partiql} from "./core/utils/templateStrings/partiql"
+export {SpectreError, SpectreResult} from "./core/result";
 export {sql} from "./core/utils/templateStrings/sql"
 export {Primitive} from "./core/utils/types/primitive"
 
-export type SpectreConfig = {
-    database: "postgresql" | "mysql"
-    uri: string
-} | {
-    database: "dynamodb"
-    region: string
-    accessKeyId: string
-    secretAccessKey: string
+export interface ISpectre {
+    strategy: Strategy
 }
 
 export class Spectre implements ISpectre {
     public strategy: Strategy
 
-    public constructor(config: SpectreConfig) {
+    public constructor(config: BaseConfig) {
         this.strategy = this.setStrategy(config)
     }
 
-    private setStrategy(config: SpectreConfig): Strategy {
+    private setStrategy(config: BaseConfig): Strategy {
         switch (config.database) {
             case "mysql":
-                return new MySQL(config.uri)
-            case"postgresql":
-                return new Postgresql(config.uri)
-            case "dynamodb":
-                return new Dynamo(config.region, config.accessKeyId, config.secretAccessKey)
+                const mysqlConfig = {
+                    uri: config.uri,
+                    database: config.database
+                }
+                return new MySQL(mysqlConfig)
             default:
                 throw new Error(`Database not supported`)
         }

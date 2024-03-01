@@ -1,27 +1,32 @@
 import mysql from 'mysql';
 import {QueryDTO, Strategy} from "../core/strategy";
-import {Result, result, SpectreError} from "../core/result";
+import {result, resultError, SpectreError, SpectreResult} from "../core/result";
 import {ConnectionStringParser, IConnectionStringParameters} from "../core/parsers/connectionStringParser";
-import {Primitive} from "../core/utils/types/primitive";
 import {sql} from "../core/utils/templateStrings/sql";
+import {MySQLConfig} from "./mysql.config";
 
 export class MySQL implements Strategy {
     private connectionObject: IConnectionStringParameters;
     private readonly connectionPool: mysql.Pool;
 
-    constructor(dateBaseUrl: string) {
+    constructor(mysqlConfig: MySQLConfig) {
         const connectionStringParser = new ConnectionStringParser({
             scheme: "mysql",
             hosts: []
         });
-        this.connectionObject = connectionStringParser.parse(dateBaseUrl);
-        this.connectionPool = this.setConnection();
-        this.applyQueryFormatToPoolConnections()
+        this.connectionObject = connectionStringParser.parse(mysqlConfig.uri);
+        try {
+            this.connectionPool = this.setConnection();
+            this.applyQueryFormatToPoolConnections()
+        } catch (err) {
+            console.error(err);
+            throw resultError("Could not connect to the database", SpectreError.DATABASE_CONNECTION_ERROR)
+        }
     }
 
     public async ping() {
-        const [query, values] = sql`/* ping */ SELECT ${1}`
-        await this.rawQuery({query, values})
+        const q = sql`/* ping */ SELECT ${1}`
+        await this.rawQuery(q)
     }
 
     private setConnection(): mysql.Pool {
@@ -40,18 +45,18 @@ export class MySQL implements Strategy {
         });
     }
 
-    private errorHandler(err: mysql.MysqlError): Result<any> {
+    private errorHandler(err: mysql.MysqlError): SpectreResult<any> {
         switch (err.code) {
             case "ER_EMPTY_QUERY":
             case "ER_PARSE_ERROR":
             case "ER_BAD_FIELD_ERROR:":
             case "ER_NO_SUCH_TABLE":
-                return result(false, err.sqlMessage, true, SpectreError.DATABASE_BAD_REQUEST);
+                return result(false, {message: err.sqlMessage}, true, SpectreError.DATABASE_BAD_REQUEST);
             case "ER_DUP_ENTRY":
-                return result(false, err.sqlMessage, true, SpectreError.DATABASE_DUPLICATE_ENTRY);
+                return result(false, {message: err.sqlMessage}, true, SpectreError.DATABASE_DUPLICATE_ENTRY);
             case "ER_WRONG_VALUE":
             case "ER_TRUNCATED_WRONG_VALUE":
-                return result(false, err.sqlMessage, true, SpectreError.DATABASE_WRONG_VALUE);
+                return result(false, {message: err.sqlMessage}, true, SpectreError.DATABASE_WRONG_VALUE);
             default:
                 return result(false, err, true);
         }
@@ -61,31 +66,15 @@ export class MySQL implements Strategy {
         this.connectionPool.on('connection', (connection) => {
             connection.config.queryFormat = function (query, values) {
                 if (!values) return query;
-                return query.replace(/\$\d+/g, function (txt) {
-                    const index = parseInt(txt.slice(1)) - 1;
-                    switch (typeof values[index]) {
-                        case 'boolean':
-                            return values[index] ? 'TRUE' : 'FALSE';
-                        case 'string':
-                        case 'number':
-                            return values[index];
-                        case 'object':
-                            return this.escape(JSON.stringify(values[index]));
-                        default:
-                            if (values[index] === null) return 'NULL';
-                            return txt
-                    }
-                }.bind(this));
+                return query.replace(/\$1/g, '?');
             }
         });
     }
 
-    public async rawQuery<ReturnValueType = any>(queryDTO: QueryDTO): Promise<Result<ReturnValueType>> {
-        if (Array.isArray(queryDTO))
-            throw result(false, "Mysql does not support multiple queries at once", true);
+    public async rawQuery<ReturnValueType extends object = any>(queryDTO: QueryDTO): Promise<SpectreResult<ReturnValueType>> {
         let connection: mysql.PoolConnection = await this.getConnection();
         try {
-            const resultValues = await this.executeQuery(connection, queryDTO.query, queryDTO.values);
+            const resultValues = await this.executeQuery(connection, queryDTO);
             const isSuccessful = Array.isArray(resultValues) ? resultValues.length > 0 : true;
             return result<ReturnValueType>(isSuccessful, resultValues, false);
         } catch (err) {
@@ -106,11 +95,11 @@ export class MySQL implements Strategy {
         });
     }
 
-    private executeQuery(connection: mysql.PoolConnection, query: string, values: Primitive[]): Promise<any> {
+    private executeQuery(connection: mysql.PoolConnection, queryDTO: QueryDTO): Promise<any> {
         return new Promise((resolve, reject) => {
             connection.query(
-                query,
-                values,
+                queryDTO[0],
+                queryDTO[1],
                 (err: mysql.MysqlError, values) => {
                     if (err) {
                         reject(this.errorHandler(err));
