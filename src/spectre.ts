@@ -1,17 +1,17 @@
 import {MySQL} from "./mysql/mysql";
-import {Strategy} from "./core/strategy";
+import {QueryDTO, Strategy} from "./core/strategy";
 import {BaseConfig} from "./core/utils/types/baseConfig";
+import {SpectreResult} from "./core/result";
 
 export {SpectreError, SpectreResult} from "./core/result";
 export {sql} from "./core/utils/templateStrings/sql"
 export {Primitive} from "./core/utils/types/primitive"
 
-export interface ISpectre {
-    strategy: Strategy
+export interface ISpectre extends Strategy {
 }
 
 export class Spectre implements ISpectre {
-    public strategy: Strategy
+    private strategy: Strategy
 
     public constructor(config: BaseConfig) {
         this.strategy = this.setStrategy(config)
@@ -28,5 +28,13 @@ export class Spectre implements ISpectre {
             default:
                 throw new Error(`Database not supported`)
         }
+    }
+
+    public ping(): Promise<void> {
+        return this.strategy.ping()
+    }
+
+    public raw<ReturnValueType extends object = object>(queryDTO: QueryDTO): Promise<SpectreResult<ReturnValueType>> {
+        return this.strategy.raw<ReturnValueType>(queryDTO);
     }
 }

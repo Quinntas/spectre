@@ -69,7 +69,9 @@ export class MySQL implements Strategy {
             const isArrayAndHasItems = Array.isArray(resultValues) && resultValues.length > 0;
             const isSuccessful = isArrayAndHasItems || resultValues.affectedRows > 0;
             const isArrayAndHasOneItem = isArrayAndHasItems && resultValues.length === 1;
-            return result<ReturnValueType>(isSuccessful, isArrayAndHasOneItem ? resultValues[0] : resultValues, false);
+            return result<ReturnValueType>(isSuccessful,
+                isArrayAndHasOneItem ? resultValues[0] : resultValues,
+                false);
         } catch (err) {
             throw err
         } finally {
