@@ -1,16 +1,21 @@
 const esbuild = require('esbuild');
-const {dtsPlugin} = require("esbuild-plugin-d.ts");
+const {dtsPlugin} = require('esbuild-plugin-d.ts');
 
-esbuild.build({
-    entryPoints: ['./src/spectre.ts'],
-    bundle: true,
-    platform: 'node',
-    outdir: './dist',
-    format: 'cjs',
-    sourcemap: true,
-    target: 'node16',
-    loader: {
-        '.ts': 'ts',
-    },
-    plugins: [dtsPlugin()]
-}).catch(() => process.exit(1));
+esbuild
+    .build({
+        entryPoints: ['./src/spectre.ts'],
+        bundle: true,
+        platform: 'node',
+        outdir: './dist',
+        format: 'esm',
+        target: 'node20',
+        treeShaking: true,
+        minify: true,
+        loader: {
+            '.ts': 'ts',
+        },
+        plugins: [dtsPlugin()],
+        splitting: true,
+        metafile: true,
+    })
+    .catch(() => process.exit(1));
